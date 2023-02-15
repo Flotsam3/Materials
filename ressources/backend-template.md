@@ -347,3 +347,71 @@ try {
     process.exit(1);
 }
 ```
+
+# AJV VALIDATION
+
+## Folder structure
+
+```js
+middleware
+    - validate.js
+routes
+    - reports.js
+    - reports.schema.js
+```
+
+## middleware/validate.js
+
+```js
+import Ajv from "ajv";
+const ajv = new Ajv({ allErrors: true });
+
+const validate = (schema) => {
+    const test = ajv.compile(schema);
+
+    return (req, res, next) => {
+        const valid = test(req.body);
+        if (!valid) return res.status(400).json(test.errors);
+
+        next();
+    };
+}
+
+export default validate;
+```
+
+## routes/reports.schema.js
+
+```js
+export const postSchema = {
+    type: "object",
+    properties: {
+        title: { type: "string" },
+        description: { type: "string" },
+        author: { type: "string" },
+    },
+    required: ["title"],
+    additionalProperties: false,
+};
+
+export const getSchema = {
+    type: "object",
+    additionalProperties: false,
+};
+
+export const deleteSchema = {
+    type: "object",
+    additionalProperties: false,
+};
+```
+
+## routes/reports.js
+
+```js
+import validate from "../middleware/validate.js";
+import { postSchema, getSchema, deleteSchema } from "./reports.schema.js";
+
+router.get("/", validate(getSchema), reports.getAll);
+router.post("/", validate(postSchema), reports.create);
+router.delete("/:id", validate(deleteSchema), reports.remove);
+```
