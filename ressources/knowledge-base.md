@@ -188,6 +188,14 @@ Connecting local repo to empty remote repo
 
 <h2 id="miscellaneous" style="color:#37d">Miscellaneous</h2>
 
+## Removing node modules from remote
+
+    git rm -r --cached node_modules
+
+    git commit -m "Removed node_modules"
+
+    git push origin master
+
 ## Ignoring whitespaces for merging
 
     git merge -X ignore-all-space
